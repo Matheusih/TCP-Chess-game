@@ -2,10 +2,10 @@
 This is a server based, TCP oriented, chess game written in Python3
 
 # Running the Server:
-```python
+```console
 python3 chess.py --server
 ```
 # Running a Client:
-```python
+```console
 python3 chess.py
 ```

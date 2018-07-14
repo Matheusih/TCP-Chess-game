@@ -13,7 +13,8 @@ def main():
         server = Server()
         server.run()
     else:
-        client = Client(args.host)
+        client = Client()
+
 
 if __name__ == "__main__":
     main()
