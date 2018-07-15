@@ -7,7 +7,7 @@ def get_args():
                         help='Defines current program as a server!')
     parser.add_argument('--host', type=str, default='0.0.0.0',
                         help='Default Server Connection')
-    parser.add_argument('--port', type=int, default=10001,
+    parser.add_argument('--port', type=int, default=10004,
                         help='Default Port Connection')
     args = parser.parse_args()
 

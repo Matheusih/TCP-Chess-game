@@ -1,9 +1,7 @@
-import socket
-import threading
-import sys
 from client import Client
 from server import Server
 from arguments import get_args
+
 
 def main():
     args = get_args()
@@ -14,6 +12,7 @@ def main():
         server.run()
     else:
         client = Client()
+        client.run()
 
 
 if __name__ == "__main__":
