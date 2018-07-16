@@ -1,6 +1,8 @@
 import socket
 import threading
 import pickle
+import json
+from chessProtocol import ChessProtocol
 from match import Match
 from player import Player
 from arguments import get_args
@@ -44,22 +46,23 @@ class Server:
             player2 = Player(connection2, address2)
             print("Player 2 conected;")
 
-            chessMatch = Match(player1, player2)
-            player_doubles.append(chessMatch)
+            chessMatch = Match()
+            #player_doubles.append(chessMatch)
 
             print("Starting Game-thread")
-            gThread = threading.Thread(target=self.handler, args=([chessMatch]))
+            gThread = threading.Thread(target=self.handler, args=([chessMatch, connection1, connection2]))
             gThread.daemon = True
             gThread.start()
             self.players.append(connection1)
             print(self.players)
 
-    def handler(self, chessMatch):
-        p1c = chessMatch.p1.connection
-        p2c = chessMatch.p2.connection
+    def handler(self, chessMatch, c1, c2):
+        p1c = c1
+        p2c = c2
         self.players
 
-        data = pickle.dumps(["B"] + chessMatch.board)
+        data = pickle.dumps(["B"] + [chessMatch.board.board]) #data serialized
+
         p1c.send(data)
         p2c.send(data)
 
@@ -72,6 +75,9 @@ class Server:
             print("Move received from p1")
 
             #chessMatch.updateBoard(move)  -- to do
+            msg = pickle.dumps(["U", move])
+            p2c.send(msg)
+            ########################################
 
             #Player 2 makes a move
             msg = "Y"
@@ -81,3 +87,6 @@ class Server:
             print("Move received from p2")
 
             #chessMatch.updateBoard(move) -- to do
+            msg = pickle.dumps(["U", move])
+            p1c.send(msg)
+            ########################################
