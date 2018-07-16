@@ -17,7 +17,6 @@ class Client:
         self.sock.connect((self.args.host, self.args.port))
 
         while True:    #Client Main Loop
-
             # Game things
             if self.match.board.score <= -MATE_LOWER:
                 print("You lost")
@@ -30,7 +29,7 @@ class Client:
 
             # After our move we rotate the board and print it again.
             # This allows us to see the effect of our move.
-            print_pos(self.match.board.rotate())
+            print_pos(self.match.board)
 
             if self.match.board.score <= -MATE_LOWER:
                 print("You won")
@@ -61,14 +60,14 @@ class Client:
                     # Inform the user when invalid input (e.g. "help") is entered
                     print("Please enter a move like g8f6")
 
-            self.match.board.move(move)
+            self.match.board = self.match.board.move(move)
             self.sock.send(pickle.dumps(move))
             return 1
         elif(data[0] == "U"):   #Update the board
             # Update the client with adversary (pseudo) legal move.
             move = data[1:]
-            print(move)
-            self.match.board.move(move[0])
+            print('Your opponent movement: ', move)
+            self.match.board = self.match.board.move(move[0])
 
             return 1
 
