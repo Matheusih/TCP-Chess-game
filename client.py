@@ -25,11 +25,8 @@ class Client:
             data = self.s_recv(1024, "B")
             if not data:
                 break
-            #print('\n what? ',data)
 
-            # After our move we rotate the board and print it again.
-            # This allows us to see the effect of our move.
-            print_pos(self.match.board)
+            print_pos(self.match.board.rotate())
 
             if self.match.board.score <= -MATE_LOWER:
                 print("You won")
@@ -47,7 +44,6 @@ class Client:
         data = pickle.loads(msg)
         if(data[0] == "B"):    #receives board from server
             self.match.upgradeBoard(data[1:])
-            #self.match.printBoard()
             return 1
         elif(data[0] == "Y"):   #its your turn, make a move
             # We query the user until she enters a (pseudo) legal move.
@@ -62,13 +58,13 @@ class Client:
 
             self.match.board = self.match.board.move(move)
             self.sock.send(pickle.dumps(move))
+
             return 1
         elif(data[0] == "U"):   #Update the board
             # Update the client with adversary (pseudo) legal move.
             move = data[1:]
             print('Your opponent movement: ', move)
             self.match.board = self.match.board.move(move[0])
-
             return 1
 
     def printBoard(self, board):
