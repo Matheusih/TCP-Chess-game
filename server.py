@@ -55,6 +55,8 @@ class Server:
             gThread.start()
             self.players.append(connection1)
             print(self.players)
+            
+            
 
     def handler(self, chessMatch, c1, c2):
         p1c = c1
@@ -62,31 +64,74 @@ class Server:
         self.players
 
         data = pickle.dumps(["B"] + [chessMatch.board.board]) #data serialized
-
-        p1c.send(data)
-        p2c.send(data)
+        try:
+            p1c.send(data)
+            p2c.send(data)
+        except:
+            print("Player disconnection...")
+            return 
 
         while True:
+        
+            i = 0
             #Player 1 makes a move
             msg = "YW"
-            p1c.send(pickle.dumps(msg))
-            move = p1c.recv(1024)
+            
+            while i < 3:
+                print("Sending p1 a message and waiting for his move..")
+                p1c.settimeout(30)
+                p1c.send(pickle.dumps(msg))
+                
+                try:
+                    move = p1c.recv(1024)  
+                    if move:
+                        break  
+                except:
+                    print("P1 Timeout!!! Try again...")
+                i += 1
+                    
+            if ( i >= 3 ):
+                print("P1 disconnected!! Ending game thread...")
+                p1c.shutdown(socket.SHUT_RDWR)
+                p1c.close()
+                p2c.close()
+                return
             move = pickle.loads(move)
             print("Move received from p1")
 
-            #chessMatch.updateBoard(move)  -- to do
+            
             msg = pickle.dumps(["U", move])
             p2c.send(msg)
             ########################################
 
+            i = 0
             #Player 2 makes a move
             msg = "YB"
-            p2c.send(pickle.dumps(msg))
-            move = p2c.recv(1024)
+            
+            while i < 3:
+                print("Sending p2 a message and waiting for his move..")
+                p2c.settimeout(30)
+                p2c.send(pickle.dumps(msg))
+                
+                try:
+                    move = p2c.recv(1024)
+                    if move:
+                        break
+                except:
+                    print("P2 Timeout!!! Try again...")
+                    
+                i += 1
+                    
+            if ( i >= 3 ):
+                print("P2 disconnected!! Ending game thread...")
+                p2c.shutdown(socket.SHUT_RDWR)
+                p1c.close()
+                p2c.close()
+                return
             move = pickle.loads(move)
             print("Move received from p2")
 
-            #chessMatch.updateBoard(move) -- to do
+                #chessMatch.updateBoard(move) -- to do
             msg = pickle.dumps(["U", move])
             p1c.send(msg)
             ########################################
