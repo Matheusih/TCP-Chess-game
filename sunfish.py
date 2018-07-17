@@ -411,8 +411,9 @@ def print_pos(pos):
     print()
     uni_pieces = {'R':'♜', 'N':'♞', 'B':'♝', 'Q':'♛', 'K':'♚', 'P':'♟',
                   'r':'♖', 'n':'♘', 'b':'♗', 'q':'♕', 'k':'♔', 'p':'♙', '.':'·'}
+    print('    H G F E D C B A')
     for i, row in enumerate(pos.board.split()):
-        print(' ', 8-i, ' '.join(uni_pieces.get(p, p) for p in row))
+        print(' ', 8-i, ' '.join(uni_pieces.get(p, p) for p in row), i)
     print('    a b c d e f g h \n\n')
 
 

@@ -68,7 +68,7 @@ class Server:
 
         while True:
             #Player 1 makes a move
-            msg = "Y"
+            msg = "YW"
             p1c.send(pickle.dumps(msg))
             move = p1c.recv(1024)
             move = pickle.loads(move)
@@ -80,7 +80,7 @@ class Server:
             ########################################
 
             #Player 2 makes a move
-            msg = "Y"
+            msg = "YB"
             p2c.send(pickle.dumps(msg))
             move = p2c.recv(1024)
             move = pickle.loads(move)

@@ -12,20 +12,21 @@ class Client:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.match = Match()
         self.searcher = Searcher()
+        self.side = 'B'
 
     def run(self):
         self.sock.connect((self.args.host, self.args.port))
 
         while True:    #Client Main Loop
             # Game things
-            
+
             data = self.s_recv(1024, "B")
             if not data:
                 break
-                
+
             #print_pos(self.match.board)
             #print_pos(self.match.board.rotate())
-            
+
             if self.match.board.score <= -MATE_LOWER:
                 print("You lost")
                 break
@@ -50,10 +51,10 @@ class Client:
             return 1
         elif(data[0] == "Y"):   #its your turn, make a move
             # We query the user until she enters a (pseudo) legal move.
+            self.side = data[1]
             move = None
-            print_pos(self.match.board)
             while move not in self.match.board.gen_moves():
-                
+                print(self.side+' ',end='')
                 match = re.match('([a-h][1-8])'*2, input('Make a move: '))
                 if match:
                     move = parse(match.group(1)), parse(match.group(2))
@@ -62,15 +63,23 @@ class Client:
                     print("Please enter a move like g8f6")
 
             self.match.board = self.match.board.move(move)
-            print_pos(self.match.board.rotate())    #Updates the board and rotate so player sees his move
+            if self.side == "W":
+                print_pos(self.match.board.rotate())    #Updates the board and rotate so player sees his move
+            else:
+                print_pos(self.match.board)
+
             self.sock.send(pickle.dumps(move))
 
             return 1
         elif(data[0] == "U"):   #Update the board
             # Update the client with adversary (pseudo) legal move.
             move = data[1:]
-            print('Your opponent movement: ', move)
             self.match.board = self.match.board.move(move[0])
+            if self.side == "B":
+                print_pos(self.match.board.rotate())    #Updates the board and rotate so player sees his move
+            else:
+                print_pos(self.match.board)
+
             return 1
 
     def printBoard(self, board):
