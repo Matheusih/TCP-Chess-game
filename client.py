@@ -76,9 +76,12 @@ class Client:
             move = data[1:]
             self.match.board = self.match.board.move(move[0])
             if self.side == "B":
+                print("Your opponent move: ", render(move[0][0]) + render(move[0][1]))
                 print_pos(self.match.board.rotate())    #Updates the board and rotate so player sees his move
             else:
+                print("Your opponent move: ", render(119-move[0][0]) + render(119-move[0][1]))
                 print_pos(self.match.board)
+
 
             return 1
 
