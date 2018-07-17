@@ -18,15 +18,17 @@ class Client:
 
         while True:    #Client Main Loop
             # Game things
-            if self.match.board.score <= -MATE_LOWER:
-                print("You lost")
-                break
-
+            
             data = self.s_recv(1024, "B")
             if not data:
                 break
-
-            print_pos(self.match.board.rotate())
+                
+            #print_pos(self.match.board)
+            #print_pos(self.match.board.rotate())
+            
+            if self.match.board.score <= -MATE_LOWER:
+                print("You lost")
+                break
 
             if self.match.board.score <= -MATE_LOWER:
                 print("You won")
@@ -44,11 +46,14 @@ class Client:
         data = pickle.loads(msg)
         if(data[0] == "B"):    #receives board from server
             self.match.upgradeBoard(data[1:])
+            print_pos(self.match.board)
             return 1
         elif(data[0] == "Y"):   #its your turn, make a move
             # We query the user until she enters a (pseudo) legal move.
             move = None
+            print_pos(self.match.board)
             while move not in self.match.board.gen_moves():
+                
                 match = re.match('([a-h][1-8])'*2, input('Make a move: '))
                 if match:
                     move = parse(match.group(1)), parse(match.group(2))
@@ -57,6 +62,7 @@ class Client:
                     print("Please enter a move like g8f6")
 
             self.match.board = self.match.board.move(move)
+            print_pos(self.match.board.rotate())    #Updates the board and rotate so player sees his move
             self.sock.send(pickle.dumps(move))
 
             return 1
