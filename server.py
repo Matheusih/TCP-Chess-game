@@ -59,6 +59,7 @@ class Server:
             
 
     def handler(self, chessMatch, c1, c2):
+        
         p1c = c1
         p2c = c2
         self.players
@@ -70,22 +71,25 @@ class Server:
         except:
             print("Player disconnection...")
             return 
-
-        while True:
-        
-            i = 0
-            #Player 1 makes a move
-            msg = "YW"
             
+        packet_counter = 0    #packet id
+        
+        while True:
+            
+            #Player 1 makes a move
+            i = 0
+            msg = "Y"
             while i < 3:
                 print("Sending p1 a message and waiting for his move..")
-                p1c.settimeout(30)
-                p1c.send(pickle.dumps(msg))
-                
                 try:
+                    p1c.settimeout(30)
+                    p1c.send(pickle.dumps(msg + str(packet_counter)))
                     move = p1c.recv(1024)  
                     if move:
-                        break  
+                        break
+                except ConnectionAbortedError:
+                    print("P1 Aborted Connection..")
+                    i = 3
                 except:
                     print("P1 Timeout!!! Try again...")
                 i += 1
@@ -98,30 +102,29 @@ class Server:
                 return
             move = pickle.loads(move)
             print("Move received from p1")
-
-            
+           
             msg = pickle.dumps(["U", move])
             p2c.send(msg)
             ########################################
 
-            i = 0
             #Player 2 makes a move
-            msg = "YB"
-            
+            i = 0
+            msg = "Y"
             while i < 3:
                 print("Sending p2 a message and waiting for his move..")
-                p2c.settimeout(30)
-                p2c.send(pickle.dumps(msg))
-                
                 try:
+                    p2c.settimeout(30)
+                    p2c.send(pickle.dumps(msg + str(packet_counter)))
                     move = p2c.recv(1024)
                     if move:
                         break
+                except ConnectionAbortedError:
+                    print("P2 Aborted Connection...")
+                    i = 3 
                 except:
                     print("P2 Timeout!!! Try again...")
                     
-                i += 1
-                    
+                i += 1   
             if ( i >= 3 ):
                 print("P2 disconnected!! Ending game thread...")
                 p2c.shutdown(socket.SHUT_RDWR)
@@ -130,8 +133,9 @@ class Server:
                 return
             move = pickle.loads(move)
             print("Move received from p2")
-
-                #chessMatch.updateBoard(move) -- to do
+            
             msg = pickle.dumps(["U", move])
             p1c.send(msg)
             ########################################
+            
+            packet_counter += 1
