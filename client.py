@@ -13,10 +13,10 @@ class Client:
         self.match = Match()
         self.searcher = Searcher()
         self.side = 'B'
+        self.last_packet = -1
 
     def run(self):
         self.sock.connect((self.args.host, self.args.port))
-
         while True:    #Client Main Loop
             # Game things
             
@@ -50,8 +50,9 @@ class Client:
         except EOFError:
             print("Your opponent has timed out! GG!!")
             return 0
+        except ConnectionAbortedError:
+            print("Server has aborted connection with you :(")
             
-
         if(data[0] == "B"):    #receives board from server
             self.match.upgradeBoard(data[1:])
             print_pos(self.match.board)
@@ -60,6 +61,10 @@ class Client:
         elif(data[0] == "Y"):   #its your turn, make a move
             # We query the user until she enters a (pseudo) legal move.
             self.side = data[1]
+            if self.side == self.last_packet:
+                print("Received a duplicated packet")
+                return 1
+            self.last_packet = self.side
             move = None
             while move not in self.match.board.gen_moves():
                 print(self.side+' ',end='')
